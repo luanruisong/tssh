@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"time"
@@ -32,7 +33,11 @@ func (s *SSHConfig) SaveToPath(path string) error {
 	if e != nil {
 		return e
 	}
-	return ioutil.WriteFile(path, b, os.ModePerm)
+	err := ioutil.WriteFile(path, b, os.ModePerm)
+	if err == nil {
+		fmt.Println("save", s.Name, " success")
+	}
+	return err
 }
 
 func GetFromPath(path string) (s *SSHConfig, e error) {

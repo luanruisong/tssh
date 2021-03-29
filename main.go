@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -13,7 +12,6 @@ import (
 )
 
 func main() {
-	//ssh.Terminal("172.16.1.156", "root", "Qaz!@#9ol.=[;.", 22)
 
 	args := os.Args
 	if len(args) < 2 {
@@ -23,49 +21,28 @@ func main() {
 	cmd := args[1]
 
 	switch strings.ToLower(cmd) {
+	case "env":
+		store.Env()
 	case "add":
-		cfg, err := parseCfg(args)
+		err := store.Add(args)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		err = store.Add(cfg)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("add", cfg.Name, " success")
 	case "del":
-		name, err := parseName(args)
+		err := store.Del(args)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		err = store.Del(name)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("del", name, " success")
 	case "set":
-		cfg, err := parseCfg(args)
+		err := store.Set(args)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		err = store.Set(cfg)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println("set", cfg.Name, " success")
 	case "get":
-		name, err := parseName(args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		info, err := store.Get(name)
+		info, err := store.GetByArgs(args)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -102,23 +79,4 @@ func printCfg(cfgs []store.SSHConfig) {
 		fmt.Fprintln(w, s)
 	}
 	w.Flush()
-}
-
-func parseCfg(args []string) (*store.SSHConfig, error) {
-	if len(args) < 6 {
-		return nil, errors.New("args error")
-	}
-	name, ip, user, pwd := args[2], args[3], args[4], args[5]
-	port := 22
-	if len(args) > 6 {
-		port, _ = strconv.Atoi(args[6])
-	}
-	return store.NewConfig(name, ip, user, pwd, port), nil
-}
-
-func parseName(args []string) (string, error) {
-	if len(args) < 3 {
-		return "", fmt.Errorf("can not get name")
-	}
-	return args[2], nil
 }
