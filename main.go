@@ -55,17 +55,18 @@ func main() {
 			return
 		}
 		printCfg(list)
+	case "conn":
+		if len(args) < 3 {
+			fmt.Println(fmt.Errorf("can not get name"))
+			return
+		}
+		connByName(args[3])
 	default:
 		if len(args) < 2 {
 			fmt.Println(fmt.Errorf("can not get name"))
 			return
 		}
-		info, err := store.Get(args[1])
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		ssh.Terminal(info.Ip, info.User, info.Pwd, info.Port)
+		connByName(args[2])
 	}
 
 }
@@ -79,4 +80,13 @@ func printCfg(cfgs []store.SSHConfig) {
 		fmt.Fprintln(w, s)
 	}
 	w.Flush()
+}
+
+func connByName(name string) {
+	info, err := store.Get(name)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	ssh.Terminal(info.Ip, info.User, info.Pwd, info.Port)
 }
