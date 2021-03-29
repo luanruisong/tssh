@@ -60,13 +60,13 @@ func main() {
 			fmt.Println(fmt.Errorf("can not get name"))
 			return
 		}
-		connByName(args[3])
+		connByName(args[2])
 	default:
 		if len(args) < 2 {
 			fmt.Println(fmt.Errorf("can not get name"))
 			return
 		}
-		connByName(args[2])
+		connByName(args[1])
 	}
 
 }
