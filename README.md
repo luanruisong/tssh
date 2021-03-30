@@ -6,12 +6,22 @@
 
 #### 下载安装 
 
-[下载tssh](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh)
+[下载tssh intel版本](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-intel)
+
+[下载tssh M1版本](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-appleSilicon)
 
 #### 一键安装
 
+intel
+
 ```shell
-sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh
+sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-intel & chmod +x /usr/local/bin/tssh
+```
+
+M1
+
+```shell
+sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-appleSilicon & chmod +x /usr/local/bin/tssh
 ```
 
 #### homebrew 安装
