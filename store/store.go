@@ -2,7 +2,6 @@ package store
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,7 +15,7 @@ var configPath string
 func DefaultCheck() error {
 	configPath = os.Getenv(EnvName)
 	if len(configPath) == 0 {
-		return errors.New("env TSSH_HOME can not find")
+		return fmt.Errorf("env '%s' not found,please set a dir in env", EnvName)
 	}
 
 	if !fileExists(configPath) {
