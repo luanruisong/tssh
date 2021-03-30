@@ -14,6 +14,12 @@
 sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh
 ```
 
+#### homebrew 安装
+
+对不起，我不配
+
+![我不配](https://blog-img.luanruisong.com/blog/img/20210330204817.png)
+
 ## 设置环境变量
 
 ```shell
