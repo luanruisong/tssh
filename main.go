@@ -1,82 +1,104 @@
 package main
 
 import (
-	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
 	"text/tabwriter"
 
-	"tssh/ssh"
 	"tssh/store"
 )
 
 func main() {
 
-	args := os.Args
-	if len(args) < 2 {
-		panic(errors.New("args required"))
-	}
+	var (
+		a = flag.String("a", "", "add config {user@host}")
+		s = flag.String("s", "", "set config {user@host}")
+		d = flag.String("d", "", "del config {name}")
+		c = flag.String("c", "", "connect config host {name}")
+		l = flag.Bool("l", false, "config list")
+		e = flag.Bool("e", false, "evn info")
+	)
 
-	cmd := args[1]
+	var (
+		n = flag.String("n", "", "set name in (-a|-s)")
+		p = flag.String("p", "", "set password in (-a|-s)")
+		P = flag.Int("P", 22, "set port in (-a|-s)")
+		k = flag.String("k", "", "set private_key path in (-a|-s)")
+	)
 
-	switch strings.ToLower(cmd) {
-	case "env":
-		store.Env()
-	case "add":
-		err := store.Add(args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	case "del":
-		err := store.Del(args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	case "set":
-		err := store.Set(args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	case "get":
-		info, err := store.GetByArgs(args)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		printCfg([]store.SSHConfig{*info})
-	case "list":
+	flag.Parse()
+
+	switch {
+	case *l:
 		list, err := store.List()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 		printCfg(list)
-	case "conn":
-		if len(args) < 3 {
-			fmt.Println(fmt.Errorf("can not get name"))
+	case *e:
+		store.Env()
+	case len(*c) > 0:
+		connByName(*c)
+	case len(*d) > 0:
+		err := store.Del(*d)
+		if err != nil {
+			fmt.Println(err)
 			return
 		}
-		connByName(args[2])
+	case len(*a) > 0:
+		if name := *n; len(name) > 0 && store.ConfigExists(name) {
+			fmt.Println("config", name, "exists")
+			return
+		}
+		fallthrough
+	case len(*s) > 0:
+		user, host := GetUserAndHost(a, s)
+		if len(user) == 0 || len(host) == 0 {
+			fmt.Println("user and host required")
+			return
+		}
+		name := *n
+		if len(name) == 0 {
+			name = host
+		}
+		pwd, sshkey := *p, *k
+		if len(pwd) == 0 && len(sshkey) == 0 {
+			fmt.Println("pwd and sshkey required")
+			return
+		}
+		cfg := store.NewConfig(name, host, user, pwd, sshkey, *P)
+		err := store.Set(cfg)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	default:
-		if len(args) < 2 {
-			fmt.Println(fmt.Errorf("can not get name"))
-			return
-		}
-		connByName(args[1])
+		fmt.Println("args not support")
 	}
 
+}
+
+func GetUserAndHost(a ...*string) (string, string) {
+	for i := range a {
+		curr := *a[i]
+		if len(curr) > 0 {
+			if idx := strings.Index(curr, "@"); idx > 0 {
+				return curr[:idx], curr[idx+1:]
+			}
+		}
+	}
+	return "", ""
 }
 
 func printCfg(cfgs []store.SSHConfig) {
 	w := tabwriter.NewWriter(os.Stdout, 10, 3, 5, ' ',
 		tabwriter.AlignRight)
-	fmt.Fprintln(w, "No\tname\tip\tuser\tpwd\tport\tsave_at\t")
+	fmt.Fprintln(w, "No\tname\tip\tuser\tpwd\tkey_path\tport\tsave_at\t")
 	for i, v := range cfgs {
-		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.Pwd, v.Port, v.SaveAt)
+		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.Pwd, v.SshKey, v.Port, v.SaveAt)
 		fmt.Fprintln(w, s)
 	}
 	w.Flush()
@@ -88,5 +110,7 @@ func connByName(name string) {
 		fmt.Println(err)
 		return
 	}
-	ssh.Terminal(info.Ip, info.User, info.Pwd, info.Port)
+	if err := info.Conn(); err != nil {
+		fmt.Println(err)
+	}
 }

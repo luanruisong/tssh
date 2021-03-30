@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 )
 
 const EnvName = "TSSH_HOME"
@@ -36,25 +35,10 @@ func fileExists(p string) bool {
 	return true
 }
 
-func Add(args []string) error {
-	cfg, err := parseCfg(args)
-	if err != nil {
-		return err
-	}
-	finalPath := path.Join(configPath, cfg.Name)
-	if fileExists(finalPath) {
-		return fmt.Errorf("config %s exists", cfg.Name)
-	}
-	return cfg.SaveToPath(finalPath)
+func ConfigExists(name string) bool {
+	return fileExists(path.Join(configPath, name))
 }
 
-func GetByArgs(args []string) (*SSHConfig, error) {
-	name, err := parseName(args)
-	if err != nil {
-		return nil, err
-	}
-	return Get(name)
-}
 func Get(name string) (*SSHConfig, error) {
 	finalPath := path.Join(configPath, name)
 	if !fileExists(finalPath) {
@@ -63,27 +47,19 @@ func Get(name string) (*SSHConfig, error) {
 	return GetFromPath(finalPath)
 }
 
-func Del(args []string) error {
-	name, err := parseName(args)
-	if err != nil {
-		return err
-	}
+func Del(name string) error {
 	finalPath := path.Join(configPath, name)
 	if !fileExists(finalPath) {
 		return fmt.Errorf("config %s not exists", name)
 	}
-	err = os.Remove(finalPath)
+	err := os.Remove(finalPath)
 	if err == nil {
 		fmt.Println("delete", name, "success")
 	}
 	return err
 }
 
-func Set(args []string) error {
-	cfg, err := parseCfg(args)
-	if err != nil {
-		return err
-	}
+func Set(cfg *SSHConfig) error {
 	finalPath := path.Join(configPath, cfg.Name)
 	if fileExists(finalPath) {
 		_ = os.Remove(finalPath)
@@ -114,23 +90,4 @@ func List() ([]SSHConfig, error) {
 
 func Env() {
 	fmt.Println("env", EnvName, "=", configPath)
-}
-
-func parseCfg(args []string) (*SSHConfig, error) {
-	if len(args) < 6 {
-		return nil, errors.New("args error")
-	}
-	name, ip, user, pwd := args[2], args[3], args[4], args[5]
-	port := 22
-	if len(args) > 6 {
-		port, _ = strconv.Atoi(args[6])
-	}
-	return NewConfig(name, ip, user, pwd, port), nil
-}
-
-func parseName(args []string) (string, error) {
-	if len(args) < 3 {
-		return "", fmt.Errorf("can not get name")
-	}
-	return args[2], nil
 }
