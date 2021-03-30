@@ -4,13 +4,13 @@
 
 安装 --> [下载tssh](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh)
 
-设置环境变量
+## 设置环境变量
 
 ```shell
     export TSSH_HOME=/Users/user/work/ssh_config/
 ```
 
-查看帮助
+## 查看帮助
 
 ```shell
 $ tssh -h
@@ -35,21 +35,30 @@ Usage of tssh:
     	set config {user@host}
 ```
 
-添加一个链接配置
+## 相关操作
 
-采用密钥模式
+### 添加一个链接配置
+
+#### 采用密钥模式
 
 ```shell
 $ tssh -a user@host -k /Users/user/.ssh/id_rsa -n name
 ```
 
-采用密码模式
+#### 采用密码模式
 
 ```shell
 $ tssh -a user@host -p 123456 -n pname
 ```
 
-查看现有链接
+#### 覆盖一个链接配置
+
+```shell
+$ tssh -a user@host -k /Users/user/.ssh/id_rsa -n name
+$ tssh -s user@host -p 123456 -n pname
+```
+
+### 查看现有链接
 
 ```shell
 $ tssh -l
@@ -58,14 +67,14 @@ No              name                ip      user                pwd             
  2             pname              host      user             123456                                    22     2021-03-30 18:38:37
 ```
 
-删除配置
+### 删除配置
 
 ```shell
 $ tssh -d name
 $ tssh -d pname
 ```
 
-链接
+### 链接
 
 ```shell
 tssh -c name
