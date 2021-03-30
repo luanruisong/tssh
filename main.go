@@ -24,7 +24,7 @@ func main() {
 		c = flag.String("c", "", "connect config host {name}")
 		l = flag.Bool("l", false, "config list")
 		e = flag.Bool("e", false, "evn info")
-		v = flag.Bool("v", false, "evn info")
+		v = flag.Bool("v", false, "app version")
 	)
 
 	var (
