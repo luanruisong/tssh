@@ -15,13 +15,13 @@
 intel
 
 ```shell
-sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-intel && sudo chmod +x /usr/local/bin/tssh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)" v1.0.0 intel
 ```
 
 M1
 
 ```shell
-sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-appleSilicon && sudo chmod +x /usr/local/bin/tssh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)" v1.0.0 appleSilicon
 ```
 
 #### homebrew 安装
