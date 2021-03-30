@@ -54,7 +54,12 @@ func main() {
 			return
 		}
 	case len(*a) > 0:
-		if name := *n; len(name) > 0 && store.ConfigExists(name) {
+		name := *n
+		if len(name) == 0 {
+			fmt.Println("config", name, "exists")
+			_, name = GetUserAndHost(a)
+		}
+		if store.ConfigExists(name) {
 			fmt.Println("config", name, "exists")
 			return
 		}
