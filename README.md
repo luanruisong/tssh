@@ -2,7 +2,17 @@
 
 ## golang 实现的ssh 工具
 
-安装 --> [下载tssh](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh)
+### 安装 
+
+#### 下载安装 
+
+[下载tssh](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh)
+
+#### 一键安装
+
+```shell
+sudo wget -O /usr/local/bin/tssh https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh
+```
 
 ## 设置环境变量
 
