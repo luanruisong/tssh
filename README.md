@@ -92,6 +92,6 @@ tssh -c name
     }
 ```
 
-翻阅了很多文档，目前还是无法解决
+翻阅了很多文档，目前还是无法解决,目前已修复为fmt打印，看起来舒服了点
 
 ![panic](https://blog-img.luanruisong.com/blog/img/20210330183152.png)
