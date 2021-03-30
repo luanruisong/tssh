@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
 	"time"
@@ -40,13 +39,13 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	fd := int(os.Stdout.Fd())
 	oldState, err := terminal.MakeRaw(fd)
 	if err != nil {
-		log.Fatalln(err.Error())
+		return err
 	}
 	defer terminal.Restore(fd, oldState)
 
 	termWidth, termHeight, err := terminal.GetSize(fd)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	// Set up terminal modes
 	modes := ssh.TerminalModes{
