@@ -24,6 +24,7 @@ func main() {
 		c = flag.String("c", "", "connect config host {name}")
 		l = flag.Bool("l", false, "config list")
 		e = flag.Bool("e", false, "evn info")
+		v = flag.Bool("v", false, "evn info")
 	)
 
 	var (
@@ -45,6 +46,8 @@ func main() {
 		printCfg(list)
 	case *e:
 		store.Env()
+	case *v:
+		fmt.Println("tssh", "version", "v1.0.0")
 	case len(*c) > 0:
 		connByName(*c)
 	case len(*d) > 0:
@@ -86,7 +89,8 @@ func main() {
 			return
 		}
 	default:
-		fmt.Println("args not support")
+		fmt.Println("args not support,please use -h")
+		flag.PrintDefaults()
 	}
 
 }
