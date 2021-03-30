@@ -12,6 +12,11 @@ import (
 
 func main() {
 
+	if err := store.DefaultCheck(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	var (
 		a = flag.String("a", "", "add config {user@host}")
 		s = flag.String("s", "", "set config {user@host}")

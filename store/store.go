@@ -13,15 +13,16 @@ const EnvName = "TSSH_HOME"
 
 var configPath string
 
-func init() {
+func DefaultCheck() error {
 	configPath = os.Getenv(EnvName)
 	if len(configPath) == 0 {
-		panic(errors.New("env TSSH_HOME can not find"))
+		return errors.New("env TSSH_HOME can not find")
 	}
 
 	if !fileExists(configPath) {
-		os.MkdirAll(configPath, os.ModePerm)
+		return os.MkdirAll(configPath, os.ModePerm)
 	}
+	return nil
 }
 
 func fileExists(p string) bool {
