@@ -64,7 +64,7 @@ $ tssh -a user@host -p 123456 -n pname
 #### 覆盖一个链接配置
 
 ```shell
-$ tssh -a user@host -k /Users/user/.ssh/id_rsa -n name
+$ tssh -s user@host -k /Users/user/.ssh/id_rsa -n name
 $ tssh -s user@host -p 123456 -n pname
 ```
 
