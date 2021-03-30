@@ -36,7 +36,8 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	//使用VT100终端来实现tab键提示，上下键查看历史命令，clear键清屏等操作
 	//VT100 start
 	//windows下不支持VT100
-	fd := int(os.Stdin.Fd())
+	//fd := int(os.Stdin.Fd())
+	fd := int(os.Stdout.Fd())
 	oldState, err := terminal.MakeRaw(fd)
 	if err != nil {
 		log.Fatalln(err.Error())
