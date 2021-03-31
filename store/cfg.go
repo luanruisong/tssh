@@ -73,3 +73,10 @@ func (s *SSHConfig) Conn() (err error) {
 	}
 	return ssh.RunTerminal(cli, os.Stdin, os.Stdout, os.Stderr)
 }
+
+func (s *SSHConfig) ConnMode() string {
+	if len(s.SshKey) > 0 {
+		return "private_key"
+	}
+	return "password"
+}

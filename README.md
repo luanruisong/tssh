@@ -12,16 +12,8 @@
 
 #### 一键安装
 
-intel
-
 ```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)" v1.0.0 intel
-```
-
-M1
-
-```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)" v1.0.0 appleSilicon
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)"
 ```
 
 #### homebrew 安装
@@ -72,6 +64,8 @@ $ tssh -a user@host -k /Users/user/.ssh/id_rsa -n name
 ```
 
 #### 采用密码模式
+
+**密码如含有特殊字符请使用单引号**
 
 ```shell
 $ tssh -a user@host -p 123456 -n pname

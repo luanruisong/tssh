@@ -57,11 +57,7 @@ func main() {
 			return
 		}
 	case len(*a) > 0:
-		name := *n
-		if len(name) == 0 {
-			fmt.Println("config", name, "exists")
-			_, name = GetUserAndHost(a)
-		}
+		name := parseName(n, a)
 		if store.ConfigExists(name) {
 			fmt.Println("config", name, "exists")
 			return
@@ -73,10 +69,7 @@ func main() {
 			fmt.Println("user and host required")
 			return
 		}
-		name := *n
-		if len(name) == 0 {
-			name = host
-		}
+		name := parseName(n, a, s)
 		pwd, sshkey := *p, *k
 		if len(pwd) == 0 && len(sshkey) == 0 {
 			fmt.Println("pwd and sshkey required")
@@ -110,9 +103,9 @@ func GetUserAndHost(a ...*string) (string, string) {
 func printCfg(cfgs []store.SSHConfig) {
 	w := tabwriter.NewWriter(os.Stdout, 10, 3, 5, ' ',
 		tabwriter.AlignRight)
-	fmt.Fprintln(w, "No\tname\tip\tuser\tpwd\tkey_path\tport\tsave_at\t")
+	fmt.Fprintln(w, "No\tname\tip\tuser\tauth_type\tport\tsave_at\t")
 	for i, v := range cfgs {
-		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.Pwd, v.SshKey, v.Port, v.SaveAt)
+		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.ConnMode(), v.Port, v.SaveAt)
 		fmt.Fprintln(w, s)
 	}
 	w.Flush()
@@ -127,4 +120,16 @@ func connByName(name string) {
 	if err := info.Conn(); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func parseName(n *string, a ...*string) string {
+	if len(*n) > 0 {
+		return *n
+	}
+	for i := range a {
+		if len(*a[i]) > 0 {
+			return *a[i]
+		}
+	}
+	return ""
 }
