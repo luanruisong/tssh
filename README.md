@@ -10,7 +10,7 @@
 
 [下载tssh M1版本](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-appleSilicon)
 
-#### 一键安装
+#### Mac一键安装
 
 ```shell
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)"
@@ -82,9 +82,9 @@ $ tssh -s user@host -p 123456 -n pname
 
 ```shell
 $ tssh -l
-No              name                ip      user                pwd                    key_path      port                 save_at
- 1              name              host      user                        /Users/user/.ssh/id_rsa        22     2021-03-30 18:38:28
- 2             pname              host      user             123456                                    22     2021-03-30 18:38:37
+No              name                ip      user               auth_mode      port                 save_at
+ 1              name              host      user             private_key        22     2021-03-30 18:38:28
+ 2             pname              host      user                passwprd        22     2021-03-30 18:38:37
 ```
 
 ### 删除配置
@@ -103,7 +103,9 @@ tssh -c name
 
 ## windows 实测
 
-在windows下 这行代码会出现 panic
+~~在windows下 这行代码会出现 panic~~
+
+~~翻阅了很多文档，目前还是无法解决,目前已修复为fmt打印，看起来舒服了点~~
 
 ```go
     termWidth, termHeight, err := terminal.GetSize(fd)
@@ -112,6 +114,8 @@ tssh -c name
     }
 ```
 
-翻阅了很多文档，目前还是无法解决,目前已修复为fmt打印，看起来舒服了点
-
 ![panic](https://blog-img.luanruisong.com/blog/img/20210330183152.png)
+
+已修复windows 问题，感谢大佬提供了一个 终端跨平台解决方案
+
+大佬项目链接 [containerd/console](https://github.com/containerd/console)

@@ -5,11 +5,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net"
-	"os"
 	"time"
 
+	"github.com/containerd/console"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 func Connect(ip string, port int, cfg *ssh.ClientConfig) (*ssh.Client, error) {
@@ -31,22 +30,20 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	session.Stdout = stdOut
 	session.Stderr = stdErr
 	session.Stdin = in
+	var (
+		current = console.Current()
+		ws      console.WinSize
+	)
+	defer current.Reset()
 
-	//使用VT100终端来实现tab键提示，上下键查看历史命令，clear键清屏等操作
-	//VT100 start
-	//windows下不支持VT100
-	//fd := int(os.Stdin.Fd())
-	fd := int(os.Stdout.Fd())
-	oldState, err := terminal.MakeRaw(fd)
-	if err != nil {
+	if err = current.SetRaw(); err != nil {
 		return err
 	}
-	defer terminal.Restore(fd, oldState)
 
-	termWidth, termHeight, err := terminal.GetSize(fd)
-	if err != nil {
+	if ws, err = current.Size(); err != nil {
 		return err
 	}
+
 	// Set up terminal modes
 	modes := ssh.TerminalModes{
 		ssh.ECHO:          1,     //打开回显
@@ -56,11 +53,11 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	}
 
 	//Request pseudo terminal
-	if err := session.RequestPty("xterm-256color", termHeight, termWidth, modes); err != nil {
+	if err = session.RequestPty("xterm-256color", int(ws.Height), int(ws.Width), modes); err != nil {
 		return err
 	}
 
-	if err := session.Shell(); err != nil {
+	if err = session.Shell(); err != nil {
 		return err
 	}
 	return session.Wait()
