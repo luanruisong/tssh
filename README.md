@@ -6,9 +6,9 @@
 
 #### 下载安装 
 
-[下载tssh intel版本](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-intel)
+下载地址 [release](https://github.com/luanruisong/tssh/releases/)
 
-[下载tssh M1版本](https://github.com/luanruisong/tssh/releases/download/v1.0.0/tssh-appleSilicon)
+windows用户请手动下载，暂时不提供一键安装模式（~~主要是批处理脚本不会写~~）
 
 #### Mac一键安装
 
