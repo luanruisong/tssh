@@ -84,7 +84,7 @@ $ tssh -s user@host -p 123456 -n pname
 $ tssh -l
 No              name                ip      user               auth_mode      port                 save_at
  1              name              host      user             private_key        22     2021-03-30 18:38:28
- 2             pname              host      user                passwprd        22     2021-03-30 18:38:37
+ 2             pname              host      user                password        22     2021-03-30 18:38:37
 ```
 
 ### 删除配置
