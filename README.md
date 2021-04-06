@@ -105,17 +105,10 @@ tssh -c name
 
 ~~在windows下 这行代码会出现 panic~~
 
-~~翻阅了很多文档，目前还是无法解决,目前已修复为fmt打印，看起来舒服了点~~
-
-```go
-    termWidth, termHeight, err := terminal.GetSize(fd)
-    if err != nil {
-        panic(err)
-    }
-```
-
 ![panic](https://blog-img.luanruisong.com/blog/img/20210330183152.png)
 
 已修复windows 问题，感谢大佬提供了一个 终端跨平台解决方案
 
 大佬项目链接 [containerd/console](https://github.com/containerd/console)
+
+解决问题的心路历程 -> [anwu's blog](https://luanruisong.com/post/golang/tssh/)
