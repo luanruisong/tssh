@@ -103,7 +103,7 @@ tssh -c name
 
 ## windows 实测
 
-~~在windows下 这行代码会出现 panic~~
+~~在windows下代码会出现 panic~~
 
 ![panic](https://blog-img.luanruisong.com/blog/img/20210330183152.png)
 
