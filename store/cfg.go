@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"strconv"
+	"text/tabwriter"
 	"time"
 
 	"tssh/ssh"
@@ -12,15 +15,22 @@ import (
 	ssh1 "golang.org/x/crypto/ssh"
 )
 
-type SSHConfig struct {
-	Name   string
-	Ip     string
-	User   string
-	Pwd    string
-	SshKey string
-	Port   int
-	SaveAt string
-}
+type (
+	SSHConfig struct {
+		Name   string
+		Ip     string
+		User   string
+		Pwd    string
+		SshKey string
+		Port   int
+		SaveAt string
+	}
+
+	BatchConfig struct {
+		list []*SSHConfig
+		m    map[string]*SSHConfig
+	}
+)
 
 func NewConfig(name, ip, user, pwd, sshKey string, port int) *SSHConfig {
 	return &SSHConfig{
@@ -79,4 +89,48 @@ func (s *SSHConfig) ConnMode() string {
 		return "private_key"
 	}
 	return "password"
+}
+
+func (bc *BatchConfig) Println() {
+	w := tabwriter.NewWriter(os.Stdout, 10, 3, 5, ' ', tabwriter.AlignRight)
+	fmt.Fprintln(w, "No\tname\tip\tuser\tauth_type\tport\tsave_at\t")
+	for i, v := range bc.list {
+		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.ConnMode(), v.Port, v.SaveAt)
+		fmt.Fprintln(w, s)
+	}
+	w.Flush()
+}
+
+func (bc *BatchConfig) Load() error {
+	dir, err := ioutil.ReadDir(configPath)
+	if err != nil {
+		return err
+	}
+	list := make([]*SSHConfig, 0)
+	m := make(map[string]*SSHConfig)
+	for _, v := range dir {
+		cfg := &SSHConfig{}
+		b, e := ioutil.ReadFile(path.Join(configPath, v.Name()))
+		if e != nil {
+			return e
+		}
+		if e = json.Unmarshal(b, cfg); err == nil {
+			list = append(list, cfg)
+			m[cfg.Name] = cfg
+		}
+	}
+	bc.list = list
+	bc.m = m
+	return nil
+}
+
+func (bc *BatchConfig) Get(str string) *SSHConfig {
+	x, err := strconv.Atoi(str)
+	if err != nil {
+		return bc.m[str]
+	}
+	if x > len(bc.list) {
+		return bc.m[str]
+	}
+	return bc.list[x-1]
 }

@@ -3,133 +3,55 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"strings"
-	"text/tabwriter"
 
+	"tssh/cmd"
 	"tssh/store"
+)
+
+var (
+	a = flag.String("a", "", "add config {user@host}")
+	s = flag.String("s", "", "set config {user@host}")
+	d = flag.String("d", "", "del config {name}")
+	c = flag.String("c", "", "connect config host {name}")
+	l = flag.Bool("l", false, "config list")
+	e = flag.Bool("e", false, "evn info")
+	v = flag.Bool("v", false, "app version")
 )
 
 func main() {
 
+	flag.Parse()
+	//查看信息
+	switch {
+	case *e:
+		store.Env()
+		return
+	case *v:
+		fmt.Println("version", "1.1.0")
+		return
+	}
+	//检测环境变量
 	if err := store.DefaultCheck(); err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	var (
-		a = flag.String("a", "", "add config {user@host}")
-		s = flag.String("s", "", "set config {user@host}")
-		d = flag.String("d", "", "del config {name}")
-		c = flag.String("c", "", "connect config host {name}")
-		l = flag.Bool("l", false, "config list")
-		e = flag.Bool("e", false, "evn info")
-		v = flag.Bool("v", false, "app version")
-	)
-
-	var (
-		n = flag.String("n", "", "set name in (-a|-s)")
-		p = flag.String("p", "", "set password in (-a|-s)")
-		P = flag.Int("P", 22, "set port in (-a|-s)")
-		k = flag.String("k", "", "set private_key path in (-a|-s)")
-	)
-
-	flag.Parse()
-
-	switch {
-	case *l:
-		list, err := store.List()
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		printCfg(list)
-	case *e:
-		store.Env()
-	case *v:
-		fmt.Println("tssh", "version", "v1.0.0")
-	case len(*c) > 0:
-		connByName(*c)
-	case len(*d) > 0:
+	//删除配置操作
+	if len(*d) > 0 {
 		err := store.Del(*d)
 		if err != nil {
 			fmt.Println(err)
-			return
 		}
-	case len(*a) > 0:
-		name := parseName(n, a)
-		if store.ConfigExists(name) {
-			fmt.Println("config", name, "exists")
-			return
-		}
-		fallthrough
-	case len(*s) > 0:
-		user, host := GetUserAndHost(a, s)
-		if len(user) == 0 || len(host) == 0 {
-			fmt.Println("user and host required")
-			return
-		}
-		name := parseName(n, a, s)
-		pwd, sshkey := *p, *k
-		if len(pwd) == 0 && len(sshkey) == 0 {
-			fmt.Println("pwd and sshkey required")
-			return
-		}
-		cfg := store.NewConfig(name, host, user, pwd, sshkey, *P)
-		err := store.Set(cfg)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	default:
-		fmt.Println("args not support,please use -h")
-		flag.PrintDefaults()
-	}
-
-}
-
-func GetUserAndHost(a ...*string) (string, string) {
-	for i := range a {
-		curr := *a[i]
-		if len(curr) > 0 {
-			if idx := strings.Index(curr, "@"); idx > 0 {
-				return curr[:idx], curr[idx+1:]
-			}
-		}
-	}
-	return "", ""
-}
-
-func printCfg(cfgs []store.SSHConfig) {
-	w := tabwriter.NewWriter(os.Stdout, 10, 3, 5, ' ',
-		tabwriter.AlignRight)
-	fmt.Fprintln(w, "No\tname\tip\tuser\tauth_type\tport\tsave_at\t")
-	for i, v := range cfgs {
-		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.ConnMode(), v.Port, v.SaveAt)
-		fmt.Fprintln(w, s)
-	}
-	w.Flush()
-}
-
-func connByName(name string) {
-	info, err := store.Get(name)
-	if err != nil {
-		fmt.Println(err)
 		return
 	}
-	if err := info.Conn(); err != nil {
-		fmt.Println(err)
+	//添加与覆盖
+	if cmd.AddOrSave(a, s) {
+		return
 	}
-}
+	//查看与链接
+	if cmd.ListAndConn(l, c) {
+		return
+	}
 
-func parseName(n *string, a ...*string) string {
-	if len(*n) > 0 {
-		return *n
-	}
-	for i := range a {
-		if len(*a[i]) > 0 {
-			return *a[i]
-		}
-	}
-	return ""
+	flag.PrintDefaults()
+
 }

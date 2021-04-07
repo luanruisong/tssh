@@ -1,9 +1,7 @@
 package store
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 )
@@ -39,14 +37,6 @@ func ConfigExists(name string) bool {
 	return fileExists(path.Join(configPath, name))
 }
 
-func Get(name string) (*SSHConfig, error) {
-	finalPath := path.Join(configPath, name)
-	if !fileExists(finalPath) {
-		return nil, fmt.Errorf("config %s not exists", name)
-	}
-	return GetFromPath(finalPath)
-}
-
 func Del(name string) error {
 	finalPath := path.Join(configPath, name)
 	if !fileExists(finalPath) {
@@ -67,27 +57,11 @@ func Set(cfg *SSHConfig) error {
 	return cfg.SaveToPath(finalPath)
 }
 
-func List() ([]SSHConfig, error) {
-	dir, err := ioutil.ReadDir(configPath)
-	if err != nil {
-		return nil, err
-	}
-	res := make([]SSHConfig, 0)
-	for _, v := range dir {
-		cfg := SSHConfig{}
-		b, e := ioutil.ReadFile(path.Join(configPath, v.Name()))
-		if e != nil {
-			return nil, e
-		}
-		if e = json.Unmarshal(b, &cfg); err == nil {
-			res = append(res, cfg)
-		} else {
-			return nil, e
-		}
-	}
-	return res, nil
+func Env() {
+	_ = DefaultCheck()
+	fmt.Println(EnvName, "=", configPath)
 }
 
-func Env() {
-	fmt.Println("env", EnvName, "=", configPath)
+func NewBatchConfig() *BatchConfig {
+	return &BatchConfig{}
 }
