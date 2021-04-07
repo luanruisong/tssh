@@ -102,6 +102,9 @@ func (bc *BatchConfig) Println() {
 }
 
 func (bc *BatchConfig) Load() error {
+	if err := DefaultCheck(); err != nil {
+		return err
+	}
 	dir, err := ioutil.ReadDir(configPath)
 	if err != nil {
 		return err

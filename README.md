@@ -32,25 +32,29 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 
 ```shell
 $ tssh -h
-Usage of tssh:
-  -P int
-    	set port in (-a|-s) (default 22)
-  -a string
-    	add config {user@host}
-  -c string
-    	connect config host {name}
-  -d string
-    	del config {name}
-  -e	evn info
-  -k string
-    	set private_key path in (-a|-s)
-  -l	config list
-  -n string
-    	set name in (-a|-s)
-  -p string
-    	set password in (-a|-s)
-  -s string
-    	set config {user@host}
+Usage of TSSH:
+
+ ______   ______     ______     __  __
+/\__  _\ /\  ___\   /\  ___\   /\ \_\ \
+\/_/\ \/ \ \___  \  \ \___  \  \ \  __ \
+   \ \_\  \/\_____\  \/\_____\  \ \_\ \_\
+    \/_/   \/_____/   \/_____/   \/_/\/_/
+
+  env		get evn info 				(e|-e)
+  version	get version info			(v|-v)
+  list 		get config list				(l|-l)
+  conn		connect to alias			(c|-c)
+  delete 	del config by alias			(d|-d)
+  add 		add config {user@host}			(a|-a)
+  save 		reset config {user@host}		(s|-s)
+	  -P int
+			set port in (add|save) (default 22)
+	  -k string
+			set private_key path in (add|save)
+	  -n string
+			set alias name in (add|save)
+	  -p string
+			set password in (add|save)
 ```
 
 ## 相关操作

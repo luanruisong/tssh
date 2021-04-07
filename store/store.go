@@ -13,9 +13,12 @@ var configPath string
 func DefaultCheck() error {
 	configPath = os.Getenv(EnvName)
 	if len(configPath) == 0 {
-		return fmt.Errorf("env '%s' not found,please set a dir in env", EnvName)
+		home := os.Getenv("HOME")
+		if len(home) == 0 {
+			return fmt.Errorf("env '%s' not found,please set a dir in env", EnvName)
+		}
+		configPath = path.Join(home, ".tssh/config")
 	}
-
 	if !fileExists(configPath) {
 		return os.MkdirAll(configPath, os.ModePerm)
 	}
@@ -38,6 +41,9 @@ func ConfigExists(name string) bool {
 }
 
 func Del(name string) error {
+	if err := DefaultCheck(); err != nil {
+		return err
+	}
 	finalPath := path.Join(configPath, name)
 	if !fileExists(finalPath) {
 		return fmt.Errorf("config %s not exists", name)
@@ -50,6 +56,9 @@ func Del(name string) error {
 }
 
 func Set(cfg *SSHConfig) error {
+	if err := DefaultCheck(); err != nil {
+		return err
+	}
 	finalPath := path.Join(configPath, cfg.Name)
 	if fileExists(finalPath) {
 		_ = os.Remove(finalPath)

@@ -10,13 +10,6 @@ import (
 	"tssh/store"
 )
 
-var (
-	n = flag.String("n", "", "set name in (-a|-s)")
-	p = flag.String("p", "", "set password in (-a|-s)")
-	P = flag.Int("P", 22, "set port in (-a|-s)")
-	k = flag.String("k", "", "set private_key path in (-a|-s)")
-)
-
 type (
 	CmdSSHConfig struct {
 		Name           string
@@ -28,20 +21,15 @@ type (
 	handler func(in string) string
 )
 
-func ParseName(n *string, a ...*string) string {
-	if len(*n) > 0 {
-		return *n
-	}
-	for i := range a {
-		if len(*a[i]) > 0 {
-			return *a[i]
-		}
-	}
-	return ""
-}
-
-func ParseArgs() *CmdSSHConfig {
-
+func ParseArgs(args []string) *CmdSSHConfig {
+	var (
+		fs = flag.NewFlagSet("set", flag.ExitOnError)
+		n  = fs.String("n", "", "set name in (-a|-s)")
+		p  = fs.String("p", "", "set password in (-a|-s)")
+		P  = fs.Int("P", 22, "set port in (-a|-s)")
+		k  = fs.String("k", "", "set private_key path in (-a|-s)")
+	)
+	fs.Parse(args)
 	return &CmdSSHConfig{
 		Name:           *n,
 		Port:           *P,
@@ -73,25 +61,25 @@ func Interactive(def string, h handler) error {
 	}
 }
 
-func GetUserAndHost(a ...*string) (string, string) {
-	for i := range a {
-		curr := *a[i]
-		if len(curr) > 0 {
-			if idx := strings.Index(curr, "@"); idx > 0 {
-				return curr[:idx], curr[idx+1:]
-			}
+func GetUserAndHost(a string) (string, string) {
+	if len(a) > 0 {
+		if idx := strings.Index(a, "@"); idx > 0 {
+			return a[:idx], a[idx+1:]
 		}
 	}
 	return "", ""
 }
 
-func AddOrSave(a, s *string) (f bool) {
-	if len(*a) == 0 && len(*s) == 0 {
-		return
-	}
-	f = true
+func Add(body string, args []string) {
+	addOrSave(body, args, true)
+}
+func Save(body string, args []string) {
+	addOrSave(body, args, false)
+}
+
+func addOrSave(body string, args []string, isAdd bool) {
 	//获取添加/覆盖配置需要的参数
-	config := ParseArgs()
+	config := ParseArgs(args)
 	//检查别名输入情况
 	if len(config.Name) == 0 {
 		const tag = "please input alias name:"
@@ -99,12 +87,12 @@ func AddOrSave(a, s *string) (f bool) {
 			if len(in) > 0 {
 				config.Name = in
 			} else {
-				config.Name = ParseName(a, s)
+				config.Name = body
 			}
 			return ""
 		})
 	}
-	if len(*a) > 0 {
+	if isAdd {
 		if store.ConfigExists(config.Name) {
 			fmt.Println("config", config.Name, "exists")
 			return
@@ -121,7 +109,7 @@ func AddOrSave(a, s *string) (f bool) {
 			return tag
 		})
 	}
-	user, host := GetUserAndHost(a, s)
+	user, host := GetUserAndHost(body)
 	if len(user) == 0 || len(host) == 0 {
 		fmt.Println("user and host required")
 		return
@@ -134,43 +122,39 @@ func AddOrSave(a, s *string) (f bool) {
 	return
 }
 
-func ListAndConn(l *bool, c *string) (f bool) {
-	if !*l && len(*c) == 0 {
-		return
-	}
-	f = true
+func List() {
 	batch := store.NewBatchConfig()
 	if err := batch.Load(); err != nil {
 		fmt.Println(err)
 		return
 	}
-	if *l {
-		const tag = "conn with index or name:"
-		batch.Println()
-		_ = Interactive(tag, func(in string) string {
-			info := batch.Get(in)
-			if info == nil {
-				fmt.Println("can not find config", in)
-				return tag
-			}
-			if err := info.Conn(); err != nil {
-				fmt.Println(err)
-			}
-			return ""
-		})
-
-	}
-
-	if len(*c) > 0 {
-		name := ParseName(c)
-		info := batch.Get(name)
+	const tag = "connect with index or name:"
+	batch.Println()
+	_ = Interactive(tag, func(in string) string {
+		info := batch.Get(in)
 		if info == nil {
-			fmt.Println("can not find config", name)
-			return
+			fmt.Println("can not find config", in)
+			return tag
 		}
 		if err := info.Conn(); err != nil {
 			fmt.Println(err)
 		}
+		return ""
+	})
+}
+
+func Conn(name string) {
+	batch := store.NewBatchConfig()
+	if err := batch.Load(); err != nil {
+		fmt.Println(err)
+		return
 	}
-	return
+	info := batch.Get(name)
+	if info == nil {
+		fmt.Println("can not find config", name)
+		return
+	}
+	if err := info.Conn(); err != nil {
+		fmt.Println(err)
+	}
 }
