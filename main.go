@@ -1,7 +1,7 @@
 package main
 
 /*
-Copyright © 2020 Luan Ruisong
+Copyright © 2021 Luan Ruisong
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -22,38 +22,12 @@ import (
 
 var version string
 
-const help = `
-Usage of TSSH:
-
- ______   ______     ______     __  __    
-/\__  _\ /\  ___\   /\  ___\   /\ \_\ \   
-\/_/\ \/ \ \___  \  \ \___  \  \ \  __ \  
-   \ \_\  \/\_____\  \/\_____\  \ \_\ \_\ 
-    \/_/   \/_____/   \/_____/   \/_/\/_/
-
-  env		get evn info 				(e|-e)
-  version	get version info			(v|-v)
-  list 		get config list				(l|-l)
-  conn		connect to alias			(c|-c)
-  delete 	del config by alias			(d|-d)
-  add 		add config {user@host}			(a|-a)
-  save 		reset config {user@host}		(s|-s)
-	  -P int
-			set port in (add|save) (default 22)
-	  -k string
-			set private_key path in (add|save)
-	  -n string
-			set alias name in (add|save)
-	  -p string
-			set password in (add|save)
-`
-
 func main() {
 
 	//flag.Parse()
 
 	if len(os.Args) < 2 {
-		fmt.Println(help)
+		cmd.LogoAndHelp()
 		return
 	}
 
@@ -68,7 +42,7 @@ func main() {
 	}
 	switch flag {
 	case "h", "-h", "help", "-help":
-		fmt.Println(help)
+		cmd.LogoAndHelp()
 	case "v", "-v", "version", "-version":
 		fmt.Println("version", version)
 	case "e", "-e", "env", "-env":
@@ -86,11 +60,8 @@ func main() {
 		cmd.List()
 	case "c", "-c", "conn", "-conn":
 		cmd.Conn(alias)
+	default:
+		cmd.LogoAndHelp()
 	}
 
-	//检测环境变量
-	if err := store.DefaultCheck(); err != nil {
-		fmt.Println(err)
-		return
-	}
 }
