@@ -32,7 +32,6 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 
 ```shell
 $ tssh -h
-Usage of TSSH:
 
  ______   ______     ______     __  __
 /\__  _\ /\  ___\   /\  ___\   /\ \_\ \
@@ -40,7 +39,10 @@ Usage of TSSH:
    \ \_\  \/\_____\  \/\_____\  \ \_\ \_\
     \/_/   \/_____/   \/_____/   \/_/\/_/
 
-  env		get evn info 				(e|-e)
+
+Usage of TSSH:
+
+  env		get env info 				(e|-e)
   version	get version info			(v|-v)
   list 		get config list				(l|-l)
   conn		connect to alias			(c|-c)

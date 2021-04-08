@@ -25,9 +25,9 @@ var version string
 func main() {
 
 	//flag.Parse()
-
+	cmd.Logo()
 	if len(os.Args) < 2 {
-		cmd.LogoAndHelp()
+		cmd.Help()
 		return
 	}
 
@@ -42,7 +42,7 @@ func main() {
 	}
 	switch flag {
 	case "h", "-h", "help", "-help":
-		cmd.LogoAndHelp()
+		cmd.Help()
 	case "v", "-v", "version", "-version":
 		fmt.Println("version", version)
 	case "e", "-e", "env", "-env":
@@ -61,7 +61,7 @@ func main() {
 	case "c", "-c", "conn", "-conn":
 		cmd.Conn(alias)
 	default:
-		cmd.LogoAndHelp()
+		cmd.Help()
 	}
 
 }
