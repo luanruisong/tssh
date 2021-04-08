@@ -14,7 +14,7 @@ const (
 	helpStr = `
 Usage of TSSH:
 
-  env		get evn info 				(e|-e)
+  env		get env info 				(e|-e)
   version	get version info			(v|-v)
   list 		get config list				(l|-l)
   conn		connect to alias			(c|-c)
