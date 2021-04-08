@@ -57,10 +57,14 @@ func main() {
 		return
 	}
 
-	flag := os.Args[1]
-	var alias string
+	var (
+		flag  = os.Args[1]
+		alias string
+		args  []string
+	)
 	if len(os.Args) >= 3 {
 		alias = os.Args[2]
+		args = os.Args[3:]
 	}
 	switch flag {
 	case "h", "-h", "help", "-help":
@@ -75,9 +79,9 @@ func main() {
 			fmt.Println(err)
 		}
 	case "a", "-a", "add", "-add":
-		cmd.Add(alias, os.Args[3:])
+		cmd.Add(alias, args)
 	case "s", "-s", "save", "-save":
-		cmd.Save(alias, os.Args[3:])
+		cmd.Save(alias, args)
 	case "l", "-l", "list", "-list":
 		cmd.List()
 	case "c", "-c", "conn", "-conn":

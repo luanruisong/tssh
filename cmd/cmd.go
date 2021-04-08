@@ -78,6 +78,16 @@ func Save(body string, args []string) {
 }
 
 func addOrSave(body string, args []string, isAdd bool) {
+	if len(body) == 0 {
+		const tag = "please input {user@host}:"
+		_ = Interactive(tag, func(in string) string {
+			if len(in) > 0 {
+				body = in
+				return ""
+			}
+			return tag
+		})
+	}
 	//获取添加/覆盖配置需要的参数
 	config := ParseArgs(args)
 	//检查别名输入情况
