@@ -48,10 +48,7 @@ func main() {
 	case "e", "-e", "env", "-env":
 		store.Env()
 	case "d", "-d", "del", "-del":
-		err := store.Del(alias)
-		if err != nil {
-			fmt.Println(err)
-		}
+		cmd.Del(alias)
 	case "a", "-a", "add", "-add":
 		cmd.Add(alias, args)
 	case "s", "-s", "save", "-save":

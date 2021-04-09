@@ -168,3 +168,14 @@ func Conn(name string) {
 		fmt.Println(err)
 	}
 }
+
+func Del(name string) {
+	if len(name) == 0 {
+		fmt.Println("input alias name")
+		return
+	}
+	err := store.Del(name)
+	if err != nil {
+		fmt.Println(err)
+	}
+}
