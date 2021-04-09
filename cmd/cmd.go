@@ -171,7 +171,7 @@ func Conn(name string) {
 
 func Del(name string) {
 	if len(name) == 0 {
-		fmt.Println("input alias name")
+		fmt.Println("alias name required")
 		return
 	}
 	err := store.Del(name)
