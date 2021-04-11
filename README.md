@@ -25,7 +25,7 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 ## 设置环境变量
 
 ```shell
-    export TSSH_HOME=/Users/user/work/ssh_config/
+export TSSH_HOME=/Users/user/work/ssh_config/
 ```
 
 ## 查看帮助
