@@ -22,6 +22,10 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 
 ![我不配](https://blog-img.luanruisong.com/blog/img/20210330204817.png)
 
+二次冲击 Homebrew 失败
+
+![new](https://blog-img.luanruisong.com/blog/img/20210412120135.png)
+
 ## 设置环境变量
 
 ```shell
