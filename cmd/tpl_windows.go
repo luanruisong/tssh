@@ -2,6 +2,8 @@
 
 package cmd
 
+import "github.com/manifoldco/promptui"
+
 var listTpl = &promptui.SelectTemplates{
 	Label:    "{{ . }}?",
 	Active:   "->{{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
