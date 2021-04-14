@@ -26,6 +26,10 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 
 ![new](https://blog-img.luanruisong.com/blog/img/20210412120135.png)
 
+#### 2.0 抢先体验版请自行下载编译安装
+
+***branch 2.0***
+
 ## 设置环境变量
 
 ```shell
