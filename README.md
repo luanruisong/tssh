@@ -136,10 +136,20 @@ $ tssh -d pname
 tssh -c name
 ```
 
-## windows 实测
+## 答谢
 
-感谢大佬提供了 终端跨平台解决方案
+### 跨平台终端解决方案
+
+主要解决windowns下获取终端信息
 
 大佬项目链接 [containerd/console](https://github.com/containerd/console)
+
+### 更加友好的交互
+
+2.0 引入了一个有意思的新包 让我们有更加有好的交互方式
+
+大佬项目链接 [manifoldco/promptui](https://github.com/manifoldco/promptui)
+
+## 其他
 
 解决问题的心路历程 -> [anwu's blog](https://luanruisong.com/post/golang/tssh/)
