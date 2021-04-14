@@ -3,7 +3,6 @@ package ssh
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"time"
 
@@ -74,12 +73,7 @@ func PwdCfg(user, pwd string) *ssh.ClientConfig {
 	}
 }
 
-func PkCfg(user, pkPath string) (*ssh.ClientConfig, error) {
-	pemBytes, err := ioutil.ReadFile(pkPath)
-	if err != nil {
-		return nil, fmt.Errorf("Reading private key file failed %v", err)
-	}
-
+func PkCfg(user string, pemBytes []byte) (*ssh.ClientConfig, error) {
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
 		return nil, fmt.Errorf("Parsing plain private key failed %v", err)

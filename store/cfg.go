@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"text/tabwriter"
 	"time"
 
 	"tssh/ssh"
@@ -17,11 +16,11 @@ import (
 
 type (
 	SSHConfig struct {
-		Name   string
+		Name   string `json:"-"`
 		Ip     string
 		User   string
 		Pwd    string
-		SshKey string
+		SshKey []byte
 		Port   int
 		SaveAt string
 	}
@@ -32,7 +31,7 @@ type (
 	}
 )
 
-func NewConfig(name, ip, user, pwd, sshKey string, port int) *SSHConfig {
+func NewConfig(name, ip, user, pwd string, sshKey []byte, port int) *SSHConfig {
 	return &SSHConfig{
 		Name:   name,
 		Ip:     ip,
@@ -54,17 +53,6 @@ func (s *SSHConfig) SaveToPath(path string) error {
 		fmt.Println("save", s.Name, " success")
 	}
 	return err
-}
-
-func GetFromPath(path string) (s *SSHConfig, e error) {
-	var b []byte
-	b, e = ioutil.ReadFile(path)
-	if e != nil {
-		return
-	}
-	s = &SSHConfig{}
-	e = json.Unmarshal(b, s)
-	return
 }
 
 func (s *SSHConfig) Conn() (err error) {
@@ -91,17 +79,18 @@ func (s *SSHConfig) ConnMode() string {
 	return "password"
 }
 
-func (bc *BatchConfig) Println() {
-	w := tabwriter.NewWriter(os.Stdout, 10, 3, 5, ' ', tabwriter.AlignRight)
-	fmt.Fprintln(w, "No\tname\tip\tuser\tauth_type\tport\tsave_at\t")
-	for i, v := range bc.list {
-		s := fmt.Sprintf("%d\t%s\t%s\t%s\t%s\t%d\t%s\t", i+1, v.Name, v.Ip, v.User, v.ConnMode(), v.Port, v.SaveAt)
-		fmt.Fprintln(w, s)
+func (s *SSHConfig) FmtName() string {
+	name := s.Name
+	if len(name) > 20 {
+		name = name[:17] + "..."
 	}
-	w.Flush()
+	return fmt.Sprintf("%-20s", name)
 }
 
 func (bc *BatchConfig) Load() error {
+	if len(bc.list) > 0 && len(bc.m) > 0 {
+		return nil
+	}
 	if err := DefaultCheck(); err != nil {
 		return err
 	}
@@ -113,11 +102,12 @@ func (bc *BatchConfig) Load() error {
 	m := make(map[string]*SSHConfig)
 	for _, v := range dir {
 		cfg := &SSHConfig{}
-		b, e := ioutil.ReadFile(path.Join(configPath, v.Name()))
-		if e != nil {
-			return e
+		var b []byte
+		if b, err = ioutil.ReadFile(path.Join(configPath, v.Name())); err != nil {
+			return err
 		}
-		if e = json.Unmarshal(b, cfg); err == nil {
+		if err = json.Unmarshal(b, cfg); err == nil {
+			cfg.Name = v.Name()
 			list = append(list, cfg)
 			m[cfg.Name] = cfg
 		}
@@ -136,4 +126,8 @@ func (bc *BatchConfig) Get(str string) *SSHConfig {
 		return bc.m[str]
 	}
 	return bc.list[x-1]
+}
+
+func (bc *BatchConfig) List() []*SSHConfig {
+	return bc.list
 }

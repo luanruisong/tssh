@@ -4,8 +4,11 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
+
+	"github.com/manifoldco/promptui"
 
 	"tssh/store"
 )
@@ -124,8 +127,19 @@ func addOrSave(body string, args []string, isAdd bool) {
 		fmt.Println("user and host required")
 		return
 	}
-	cfg := store.NewConfig(config.Name, host, user, config.Pwd, config.PrivateKeyPath, config.Port)
-	err := store.Set(cfg)
+	var (
+		privateKey []byte
+		err        error
+	)
+	if len(config.PrivateKeyPath) > 0 {
+		privateKey, err = ioutil.ReadFile(config.PrivateKeyPath)
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+	}
+	cfg := store.NewConfig(config.Name, host, user, config.Pwd, privateKey, config.Port)
+	err = store.Set(cfg)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -133,32 +147,44 @@ func addOrSave(body string, args []string, isAdd bool) {
 }
 
 func List() {
-	batch := store.NewBatchConfig()
-	if err := batch.Load(); err != nil {
+	batch, err := store.GetBatchConfig()
+	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	const tag = "connect with index or name:"
-	batch.Println()
-	_ = Interactive(tag, func(in string) string {
-		info := batch.Get(in)
-		if info == nil {
-			fmt.Println("can not find config", in)
-			return tag
-		}
-		if err := info.Conn(); err != nil {
-			fmt.Println(err)
-		}
-		return ""
-	})
+	list := batch.List()
+
+	prompt := promptui.Select{
+		Label:     "Select config",
+		Items:     list,
+		Templates: listTpl,
+		Size:      20,
+	}
+	index, _, err := prompt.Run()
+	if err != nil {
+		fmt.Println("error", err.Error())
+		return
+	}
+	if err := list[index].Conn(); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func Conn(name string) {
-	batch := store.NewBatchConfig()
-	if err := batch.Load(); err != nil {
-		fmt.Println(err)
-		return
+	if len(name) == 0 {
+		prompt := promptui.Prompt{
+			Label:     "conn config name",
+			Templates: validateTpl,
+			Validate:  validateFunc,
+		}
+		var err error
+		name, err = prompt.Run()
+		if err != nil {
+			fmt.Println("get config error", err.Error())
+			return
+		}
 	}
+	batch, _ := store.GetBatchConfig()
 	info := batch.Get(name)
 	if info == nil {
 		fmt.Println("can not find config", name)
@@ -171,11 +197,19 @@ func Conn(name string) {
 
 func Del(name string) {
 	if len(name) == 0 {
-		fmt.Println("alias name required")
-		return
+		prompt := promptui.Prompt{
+			Label:     "delete config name",
+			Templates: validateTpl,
+			Validate:  validateFunc,
+		}
+		var err error
+		name, err = prompt.Run()
+		if err != nil {
+			fmt.Println("get config error", err.Error())
+			return
+		}
 	}
-	err := store.Del(name)
-	if err != nil {
+	if err := store.Del(name); err != nil {
 		fmt.Println(err)
 	}
 }

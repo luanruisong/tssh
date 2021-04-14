@@ -71,6 +71,15 @@ func Env() {
 	fmt.Println(EnvName, "=", configPath)
 }
 
-func NewBatchConfig() *BatchConfig {
-	return &BatchConfig{}
+var (
+	global *BatchConfig
+)
+
+func GetBatchConfig() (*BatchConfig, error) {
+	var err error
+	if global == nil {
+		global = &BatchConfig{}
+		err = global.Load()
+	}
+	return global, err
 }

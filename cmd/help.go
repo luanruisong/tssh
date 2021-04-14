@@ -1,6 +1,13 @@
 package cmd
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/manifoldco/promptui"
+
+	"tssh/store"
+)
 
 const (
 	logoStr = `
@@ -45,3 +52,37 @@ func LogoAndHelp() {
 	Logo()
 	Help()
 }
+
+var (
+	validateFunc = func(input string) error {
+		g, err := store.GetBatchConfig()
+		if err != nil {
+			return err
+		}
+		if g.Get(input) == nil {
+			return errors.New("can not get config")
+		}
+		return err
+	}
+
+	validateTpl = &promptui.PromptTemplates{
+		Prompt:  "{{ . }} ",
+		Valid:   "{{ . | green }} ",
+		Invalid: "{{ . | red }} ",
+		Success: "{{ . | bold }} ",
+	}
+
+	listTpl = &promptui.SelectTemplates{
+		Label:    "{{ . }}?",
+		Active:   "\U0001F336 {{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
+		Inactive: "  {{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
+		Selected: "start connect {{ .Name | cyan }}({{ .User | yellow }}@{{ .Ip | red }})...",
+		Details: `
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Ip:" | faint }}	{{ .Ip }}
+{{ "User:" | faint }}	{{ .User }}
+{{ "Port:" | faint }}	{{ .Port }}
+{{ "ConnMode:" | faint }}	{{ .ConnMode }}
+{{ "SaveAt:" | faint }}	{{ .SaveAt }}`,
+	}
+)
