@@ -56,11 +56,6 @@ func Help() {
 	fmt.Print(helpStr)
 }
 
-func LogoAndHelp() {
-	Logo()
-	Help()
-}
-
 var (
 	validateFunc = func(input string) error {
 		g, err := store.GetBatchConfig()
