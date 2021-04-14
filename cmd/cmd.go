@@ -1,11 +1,10 @@
 package cmd
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"net"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -41,29 +40,6 @@ func ParseArgs(args []string) *CmdSSHConfig {
 	}
 }
 
-func Interactive(def string, h handler) error {
-	fmt.Printf(def)
-	inputReader := bufio.NewReader(os.Stdin)
-	for {
-		input, err := inputReader.ReadString('\n')
-		if err != nil {
-			return err
-		}
-		inputStr := strings.TrimSpace(input)
-		switch inputStr {
-		case "exit", "q", "quit":
-			return nil
-		default:
-			if x := h(inputStr); len(x) > 0 {
-				fmt.Printf("%s", x)
-			} else {
-				return nil
-			}
-		}
-
-	}
-}
-
 func GetUserAndHost(a string) (string, string) {
 	if len(a) > 0 {
 		if idx := strings.Index(a, "@"); idx > 0 {
@@ -81,29 +57,50 @@ func Save(body string, args []string) {
 }
 
 func addOrSave(body string, args []string, isAdd bool) {
+	var err error
 	if len(body) == 0 {
-		const tag = "please input {user@host}:"
-		_ = Interactive(tag, func(in string) string {
-			if len(in) > 0 {
-				body = in
-				return ""
-			}
-			return tag
-		})
+		prompt := promptui.Prompt{
+			Label:     "please input {user@host}",
+			Templates: validateTpl,
+			Validate: func(input string) error {
+				if strings.Index(input, "@") < 0 {
+					return fmt.Errorf("con not decode:%s", input)
+				}
+				x := strings.Split(input, "@")
+				if len(x) != 2 {
+					return fmt.Errorf("con not decode:%s", input)
+				}
+				if len(x[0]) == 0 || len(x[1]) == 0 {
+					return fmt.Errorf("user && ip required")
+				}
+				if address := net.ParseIP(x[1]); address == nil {
+					return fmt.Errorf("con not decode ip:%s", x[1])
+				}
+				return nil
+			},
+		}
+		body, err = prompt.Run()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
 	}
 	//获取添加/覆盖配置需要的参数
 	config := ParseArgs(args)
 	//检查别名输入情况
 	if len(config.Name) == 0 {
-		const tag = "please input alias name:"
-		_ = Interactive(tag, func(in string) string {
-			if len(in) > 0 {
-				config.Name = in
-			} else {
-				config.Name = body
-			}
-			return ""
-		})
+		prompt := promptui.Prompt{
+			Label:     "please input alias name",
+			Templates: validateTpl,
+		}
+		config.Name, err = prompt.Run()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
+		if len(config.Name) == 0 {
+			config.Name = body
+		}
 	}
 	if isAdd {
 		if store.ConfigExists(config.Name) {
@@ -113,14 +110,21 @@ func addOrSave(body string, args []string, isAdd bool) {
 	}
 	//检查密码和密钥输入情况
 	if len(config.Pwd) == 0 && len(config.PrivateKeyPath) == 0 {
-		const tag = "please input password:"
-		_ = Interactive(tag, func(in string) string {
-			if len(in) > 0 {
-				config.Pwd = in
-				return ""
-			}
-			return tag
-		})
+		prompt := promptui.Prompt{
+			Label:     "please input passworde",
+			Templates: validateTpl,
+			Validate: func(input string) error {
+				if len(input) == 0 {
+					return fmt.Errorf("pwd required")
+				}
+				return nil
+			},
+		}
+		config.Pwd, err = prompt.Run()
+		if err != nil {
+			fmt.Println(err.Error())
+			return
+		}
 	}
 	user, host := GetUserAndHost(body)
 	if len(user) == 0 || len(host) == 0 {
@@ -129,7 +133,6 @@ func addOrSave(body string, args []string, isAdd bool) {
 	}
 	var (
 		privateKey []byte
-		err        error
 	)
 	if len(config.PrivateKeyPath) > 0 {
 		privateKey, err = ioutil.ReadFile(config.PrivateKeyPath)
@@ -197,17 +200,25 @@ func Conn(name string) {
 
 func Del(name string) {
 	if len(name) == 0 {
-		prompt := promptui.Prompt{
-			Label:     "delete config name",
-			Templates: validateTpl,
-			Validate:  validateFunc,
-		}
-		var err error
-		name, err = prompt.Run()
+		batch, err := store.GetBatchConfig()
 		if err != nil {
-			fmt.Println("get config error", err.Error())
+			fmt.Println(err)
 			return
 		}
+		list := batch.List()
+
+		prompt := promptui.Select{
+			Label:     "Select config",
+			Items:     list,
+			Templates: listTpl,
+			Size:      20,
+		}
+		index, _, err := prompt.Run()
+		if err != nil {
+			fmt.Println("error", err.Error())
+			return
+		}
+		name = list[index].Name
 	}
 	if err := store.Del(name); err != nil {
 		fmt.Println(err)
