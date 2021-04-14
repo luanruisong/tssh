@@ -156,7 +156,7 @@ func List() {
 	list := batch.List()
 
 	prompt := promptui.Select{
-		Label:     "Select config ",
+		Label:     "Connect config ",
 		Items:     list,
 		Templates: listTpl,
 		Size:      20,
@@ -173,17 +173,8 @@ func List() {
 
 func Conn(name string) {
 	if len(name) == 0 {
-		prompt := promptui.Prompt{
-			Label:     "conn config name",
-			Templates: validateTpl,
-			Validate:  validateFunc,
-		}
-		var err error
-		name, err = prompt.Run()
-		if err != nil {
-			fmt.Println("get config error", err.Error())
-			return
-		}
+		List()
+		return
 	}
 	batch, _ := store.GetBatchConfig()
 	info := batch.Get(name)
@@ -206,7 +197,7 @@ func Del(name string) {
 		list := batch.List()
 
 		prompt := promptui.Select{
-			Label:     "Select config ",
+			Label:     "Delete config ",
 			Items:     list,
 			Templates: listTpl,
 			Size:      20,

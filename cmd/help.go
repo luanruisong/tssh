@@ -38,6 +38,14 @@ Usage of TSSH:
 			set password in (add|save)
 
 `
+	detail = `
+----------------------------------------------------
+{{ "Name:" | faint }}	{{ .Name }}
+{{ "Ip:" | faint }}	{{ .Ip }}
+{{ "User:" | faint }}	{{ .User }}
+{{ "Port:" | faint }}	{{ .Port }}
+{{ "ConnMode:" | faint }}	{{ .ConnMode }}
+{{ "SaveAt:" | faint }}	{{ .SaveAt }}`
 )
 
 func Logo() {
