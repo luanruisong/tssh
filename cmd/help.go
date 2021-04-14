@@ -74,8 +74,8 @@ var (
 
 	listTpl = &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
-		Active:   "\U0001F336 {{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
-		Inactive: "  {{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
+		Active:   "🔑️\t{{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
+		Inactive: "\t{{ .FmtName | cyan }} ({{ .User | yellow }}@{{ .Ip | red }})",
 		Selected: "start connect {{ .Name | cyan }}({{ .User | yellow }}@{{ .Ip | red }})...",
 		Details: `
 {{ "Name:" | faint }}	{{ .Name }}
