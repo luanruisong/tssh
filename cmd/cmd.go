@@ -19,8 +19,6 @@ type (
 		Pwd            string
 		PrivateKeyPath string
 	}
-
-	handler func(in string) string
 )
 
 func ParseArgs(args []string) *CmdSSHConfig {
@@ -158,7 +156,7 @@ func List() {
 	list := batch.List()
 
 	prompt := promptui.Select{
-		Label:     "Select config",
+		Label:     "Select config ",
 		Items:     list,
 		Templates: listTpl,
 		Size:      20,
@@ -208,7 +206,7 @@ func Del(name string) {
 		list := batch.List()
 
 		prompt := promptui.Select{
-			Label:     "Select config",
+			Label:     "Select config ",
 			Items:     list,
 			Templates: listTpl,
 			Size:      20,
