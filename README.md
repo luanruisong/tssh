@@ -30,10 +30,16 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 
 ***branch 2.0***
 
-## 设置环境变量
+## 环境变量
 
+### 手动设置
 ```shell
 export TSSH_HOME=/Users/user/work/ssh_config/
+```
+### 默认设置
+```shell
+# 默认设置在windows环境下不生效
+export TSSH_HOME=$HOME/.tssh/config
 ```
 
 ## 查看帮助
@@ -92,13 +98,29 @@ $ tssh -s user@host -k /Users/user/.ssh/id_rsa -n name
 $ tssh -s user@host -p 123456 -n pname
 ```
 
-### 查看现有链接
+### 查看现有链接（2.0）
 
 ```shell
 $ tssh -l
-No              name                ip      user               auth_mode      port                 save_at
- 1              name              host      user             private_key        22     2021-03-30 18:38:28
- 2             pname              host      user                password        22     2021-03-30 18:38:37
+
+ ______   ______     ______     __  __
+/\__  _\ /\  ___\   /\  ___\   /\ \_\ \
+\/_/\ \/ \ \___  \  \ \___  \  \ \  __ \
+   \ \_\  \/\_____\  \/\_____\  \ \_\ \_\
+    \/_/   \/_____/   \/_____/   \/_/\/_/
+
+Use the arrow keys to navigate: ↓ ↑ → ←
+Select config?
+  🌶 name                 (root@123.123.123.123)
+     pname                (root@123.123.123.124)
+
+Name:            name
+Ip:              123.123.123.123
+User:            root
+Port:            22
+ConnMode:        private_key
+SaveAt:          2021-04-13 14:19:21
+
 ```
 
 ### 删除配置
@@ -114,14 +136,9 @@ $ tssh -d pname
 tssh -c name
 ```
 
-
 ## windows 实测
 
-~~在windows下代码会出现 panic~~
-
-![panic](https://blog-img.luanruisong.com/blog/img/20210330183152.png)
-
-已修复windows 问题，感谢大佬提供了一个 终端跨平台解决方案
+感谢大佬提供了 终端跨平台解决方案
 
 大佬项目链接 [containerd/console](https://github.com/containerd/console)
 
