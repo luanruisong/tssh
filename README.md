@@ -66,7 +66,7 @@ export TSSH_HOME=$HOME/.tssh/config
 
 ### 更加友好的交互
 
-2.0 引入了一个有意思的新包 让我们有更加有好的交互方式
+2.0 引入了一个有意思的新包 让我们有更加友好的交互方式
 
 大佬项目链接 [manifoldco/promptui](https://github.com/manifoldco/promptui)
 
