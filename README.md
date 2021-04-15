@@ -24,7 +24,7 @@ export TSSH_HOME=/Users/user/work/ssh_config/
 ```
 ### 默认设置
 ```shell
-# 默认设置在windows环境下不生效
+# 默认设置在windows环境下使用%HOMEPATH%
 export TSSH_HOME=$HOME/.tssh/config
 ```
 
@@ -51,10 +51,6 @@ export TSSH_HOME=$HOME/.tssh/config
 ### 删除配置
 
 ![del](https://blog-img.luanruisong.com/blog/img/20210414140941.gif)
-
-### 链接
-
-![conn](https://blog-img.luanruisong.com/blog/img/20210414141410.gif)
 
 ## 答谢
 
