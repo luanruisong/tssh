@@ -4,47 +4,21 @@ import (
 	"fmt"
 	"os"
 	"path"
+
+	"tssh/constant"
 )
 
-const EnvName = "TSSH_HOME"
+func Env() string {
 
-var configPath string
-
-func DefaultCheck() error {
-	configPath = os.Getenv(EnvName)
-	if len(configPath) == 0 {
-		home := os.Getenv("HOME")
-		if len(home) == 0 {
-			return fmt.Errorf("env '%s' not found,please set a dir in env", EnvName)
-		}
-		configPath = path.Join(home, ".tssh/config")
-	}
-	if !fileExists(configPath) {
-		return os.MkdirAll(configPath, os.ModePerm)
-	}
-	return nil
-}
-
-func fileExists(p string) bool {
-	_, err := os.Stat(p) //os.Stat获取文件信息
-	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		return false
-	}
-	return true
+	return cfgPath
 }
 
 func ConfigExists(name string) bool {
-	return fileExists(path.Join(configPath, name))
+	return fileExists(path.Join(Env(), name))
 }
 
 func Del(name string) error {
-	if err := DefaultCheck(); err != nil {
-		return err
-	}
-	finalPath := path.Join(configPath, name)
+	finalPath := path.Join(Env(), name)
 	if !fileExists(finalPath) {
 		return fmt.Errorf("config %s not exists", name)
 	}
@@ -55,31 +29,6 @@ func Del(name string) error {
 	return err
 }
 
-func Set(cfg *SSHConfig) error {
-	if err := DefaultCheck(); err != nil {
-		return err
-	}
-	finalPath := path.Join(configPath, cfg.Name)
-	if fileExists(finalPath) {
-		_ = os.Remove(finalPath)
-	}
-	return cfg.SaveToPath(finalPath)
-}
-
-func Env() {
-	_ = DefaultCheck()
-	fmt.Println(EnvName, "=", configPath)
-}
-
-var (
-	global *BatchConfig
-)
-
-func GetBatchConfig() (*BatchConfig, error) {
-	var err error
-	if global == nil {
-		global = &BatchConfig{}
-		err = global.Load()
-	}
-	return global, err
+func FmtEnv() {
+	fmt.Println(constant.EnvName, "=", Env())
 }

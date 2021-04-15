@@ -46,7 +46,7 @@ func main() {
 	case "v", "-v", "version", "-version":
 		fmt.Println("version", version)
 	case "e", "-e", "env", "-env":
-		store.Env()
+		store.FmtEnv()
 	case "d", "-d", "del", "-del":
 		cmd.Del(alias)
 	case "a", "-a", "add", "-add":
