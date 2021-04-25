@@ -59,7 +59,22 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	if err = session.Shell(); err != nil {
 		return err
 	}
+	go consoleMonitor(current)
 	return session.Wait()
+}
+
+func consoleMonitor(c console.Console) {
+	t := time.NewTicker(time.Second)
+	for {
+		select {
+		case <-t.C:
+			ws, err := c.Size()
+			if err != nil {
+				break
+			}
+			_ = c.Resize(ws)
+		}
+	}
 }
 
 func PwdCfg(user, pwd string) *ssh.ClientConfig {
