@@ -16,6 +16,12 @@ windows用户请手动下载，暂时不提供一键安装模式（~~主要是�
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)"
 ```
 
+#### homebrew 安装
+
+```shell
+$ brew install tssh
+```
+
 ## 环境变量
 
 ### 手动设置
