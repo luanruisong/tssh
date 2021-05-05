@@ -64,15 +64,22 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 }
 
 func consoleMonitor(c console.Console) {
-	t := time.NewTicker(time.Second)
+	var (
+		t     = time.NewTicker(time.Second)
+		ws, _ = c.Size()
+	)
 	for {
 		select {
 		case <-t.C:
-			ws, err := c.Size()
+			cws, err := c.Size()
 			if err != nil {
+				fmt.Println(err.Error())
 				break
 			}
-			_ = c.Resize(ws)
+			if cws.Height != ws.Height || cws.Width != ws.Width {
+				ws = cws
+				_ = c.Reset()
+			}
 		}
 	}
 }
