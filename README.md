@@ -8,14 +8,6 @@
 
 下载地址 [release](https://github.com/luanruisong/tssh/releases/)
 
-windows用户请手动下载，暂时不提供一键安装模式（~~主要是批处理脚本不会写~~）
-
-#### Mac一键安装
-
-```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/luanruisong/tssh/master/install.sh)"
-```
-
 #### homebrew 安装
 
 ```shell
