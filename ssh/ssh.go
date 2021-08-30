@@ -33,7 +33,6 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 		current = console.Current()
 		ws      console.WinSize
 	)
-	defer current.Reset()
 
 	if err = current.SetRaw(); err != nil {
 		return err
@@ -59,13 +58,13 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	if err = session.Shell(); err != nil {
 		return err
 	}
-	go consoleMonitor(current)
+	go consoleMonitor(current, session)
 	return session.Wait()
 }
 
-func consoleMonitor(c console.Console) {
+func consoleMonitor(c console.Console, session *ssh.Session) {
 	var (
-		t     = time.NewTicker(time.Second)
+		t     = time.NewTicker(time.Second / 10)
 		ws, _ = c.Size()
 	)
 	for {
@@ -77,8 +76,8 @@ func consoleMonitor(c console.Console) {
 				break
 			}
 			if cws.Height != ws.Height || cws.Width != ws.Width {
+				_ = session.WindowChange(int(cws.Height), int(cws.Width))
 				ws = cws
-				_ = c.Reset()
 			}
 		}
 	}
