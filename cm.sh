@@ -6,6 +6,5 @@ target="$workdir/other/date/`date +%Y-%m-%d`.txt"
 echo "`date`" >> "$target"
 cd $workdir
 git add $target
-fmtdate=$(date '+%Y-%m-%d %H:%M:%S')
-git commit -am "fix some bug at $fmtdate"
+git commit -am "fix some bug at `date '+%Y-%m-%d %H:%M:%S'`"
 git push
