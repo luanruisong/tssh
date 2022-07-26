@@ -3,7 +3,7 @@
 
 workdir=$(cd $(dirname $0); pwd)
 target="$workdir/other/date/`date +%Y-%m-%d`.txt"
-echo $(date) > "$target"
+echo "`date`" >> "$target"
 cd $workdir
 git add $target
 fmtdate=$(date '+%Y-%m-%d %H:%M:%S')
