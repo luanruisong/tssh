@@ -28,7 +28,7 @@ export TSSH_HOME=$HOME/.tssh/config
 
 ## 查看帮助
 
-![help](https://blog-img.luanruisong.com/blog/img/20210414135853.gif)
+![help](./static/help.gif)
 
 ## 相关操作
 
@@ -36,19 +36,19 @@ export TSSH_HOME=$HOME/.tssh/config
 
 #### 采用密码模式
 
-![add](https://blog-img.luanruisong.com/blog/img/20210414140115.gif)
+![add](./static/add.gif)
 
 #### 指定更多参数
 
-![addmore](https://blog-img.luanruisong.com/blog/img/20210414140311.gif)
+![addmore](./static/addmore.gif)
 
 ### 查看现有链接（2.0）
 
-![list](https://blog-img.luanruisong.com/blog/img/20210414140709.gif)
+![list](./static/list.gif)
 
 ### 删除配置
 
-![del](https://blog-img.luanruisong.com/blog/img/20210414140941.gif)
+![del](./static/list.gif)
 
 ## 答谢
 
