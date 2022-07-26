@@ -6,7 +6,7 @@ target="$workdir/other/date/support_`date +%Y%m%d`.go"
 if [ ! -f "$target" ]; then
  printf "package other\n\n" >> $target
 fi
-printf "func FixData_`date '+%Y%m%d%H%M%S'`()(string,error){}\n\n" >> "$target"
+printf "func FixData_`date '+%Y%m%d%H%M%S'`()(string,error){ return \"\",nil}\n\n" >> "$target"
 cd $workdir
 git add $target
 git commit -am "add func at `date '+%Y-%m-%d %H:%M:%S'`"

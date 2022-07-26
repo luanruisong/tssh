@@ -1,4 +1,4 @@
 package other
 
-func FixData_20220726162906()(string,error){}
+func FixData_20220726162943()(string,error){ return "",nil}
 
