@@ -2,7 +2,7 @@
 
 
 workdir=$(cd $(dirname $0); pwd)
-target="$workdir/other/date/support_`date +%Y%m%d%`.go"
+target="$workdir/other/date/support_`date +%Y%m%d`.go"
 if [ ! -f "$target" ]; then
  echo "package other\n\n" >> $target
 fi
