@@ -1,2 +1,4 @@
-package other\n\n
-func FixData_20220726161051()(string,error){}\n\n
+package other
+
+func FixData_20220726162906()(string,error){}
+
