@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/containerd/console"
+	"github.com/trzsz/trzsz-go/trzsz"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -19,16 +20,14 @@ func Connect(ip string, port int, cfg *ssh.ClientConfig) (*ssh.Client, error) {
 	return sshClient, nil
 }
 
-func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
+func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.WriteCloser) error {
 	session, err := c.NewSession()
 	if err != nil {
 		return err
 	}
 	defer session.Close()
 	session.Signal(ssh.SIGINT)
-	session.Stdout = stdOut
 	session.Stderr = stdErr
-	session.Stdin = in
 	var (
 		current = console.Current()
 		ws      console.WinSize
@@ -55,14 +54,26 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 		return err
 	}
 
+	// Support trzsz ( trz / tsz )
+	serverIn, err := session.StdinPipe()
+	if err != nil {
+		return err
+	}
+	serverOut, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	trzszFilter := trzsz.NewTrzszFilter(in, stdOut, serverIn, serverOut,
+		trzsz.TrzszOptions{TerminalColumns: int32(ws.Width)})
+
 	if err = session.Shell(); err != nil {
 		return err
 	}
-	go consoleMonitor(current, session)
+	go consoleMonitor(current, session, trzszFilter)
 	return session.Wait()
 }
 
-func consoleMonitor(c console.Console, session *ssh.Session) {
+func consoleMonitor(c console.Console, session *ssh.Session, trzszFilter *trzsz.TrzszFilter) {
 	var (
 		t     = time.NewTicker(time.Second / 10)
 		ws, _ = c.Size()
@@ -77,6 +88,7 @@ func consoleMonitor(c console.Console, session *ssh.Session) {
 			}
 			if cws.Height != ws.Height || cws.Width != ws.Width {
 				_ = session.WindowChange(int(cws.Height), int(cws.Width))
+				trzszFilter.SetTerminalColumns(int32(cws.Width))
 				ws = cws
 			}
 		}
