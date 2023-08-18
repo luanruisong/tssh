@@ -9,7 +9,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 
-	"tssh/store"
+	"github.com/luanruisong/tssh/store"
 )
 
 var (

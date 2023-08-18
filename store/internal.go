@@ -5,7 +5,7 @@ import (
 	"path"
 	"sync"
 
-	"tssh/constant"
+	"github.com/luanruisong/tssh/constant"
 )
 
 var (

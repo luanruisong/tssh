@@ -16,8 +16,8 @@ import (
 	"fmt"
 	"os"
 
-	"tssh/cmd"
-	"tssh/store"
+	"github.com/luanruisong/tssh/cmd"
+	"github.com/luanruisong/tssh/store"
 )
 
 var version string

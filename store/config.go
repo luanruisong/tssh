@@ -8,7 +8,7 @@ import (
 	"path"
 	"time"
 
-	"tssh/ssh"
+	"github.com/luanruisong/tssh/ssh"
 
 	ssh1 "golang.org/x/crypto/ssh"
 )

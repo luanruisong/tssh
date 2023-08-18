@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"tssh/constant"
+	"github.com/luanruisong/tssh/constant"
 )
 
 func Logo() {

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"tssh/constant"
+	"github.com/luanruisong/tssh/constant"
 )
 
 func Env() string {

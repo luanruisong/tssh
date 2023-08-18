@@ -7,8 +7,8 @@ import (
 
 	"github.com/manifoldco/promptui"
 
-	"tssh/constant"
-	"tssh/store"
+	"github.com/luanruisong/tssh/constant"
+	"github.com/luanruisong/tssh/store"
 )
 
 type (
