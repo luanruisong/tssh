@@ -1,4 +1,4 @@
-module tssh
+module github.com/luanruisong/tssh
 
 require (
 	github.com/containerd/console v1.0.1
