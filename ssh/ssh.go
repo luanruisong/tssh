@@ -2,8 +2,9 @@ package ssh
 
 import (
 	"fmt"
+	"github.com/manifoldco/promptui"
 	"io"
-	"net"
+	"strings"
 	"time"
 
 	"github.com/containerd/console"
@@ -58,40 +59,11 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	if err = session.Shell(); err != nil {
 		return err
 	}
-	go consoleMonitor(current, session)
 	return session.Wait()
 }
 
-func consoleMonitor(c console.Console, session *ssh.Session) {
-	var (
-		t     = time.NewTicker(time.Second / 10)
-		ws, _ = c.Size()
-	)
-	for {
-		select {
-		case <-t.C:
-			cws, err := c.Size()
-			if err != nil {
-				fmt.Println(err.Error())
-				break
-			}
-			if cws.Height != ws.Height || cws.Width != ws.Width {
-				_ = session.WindowChange(int(cws.Height), int(cws.Width))
-				ws = cws
-			}
-		}
-	}
-}
-
 func PwdCfg(user, pwd string) *ssh.ClientConfig {
-	return &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{ssh.Password(pwd)},
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
-		Timeout: 10 * time.Second,
-	}
+	return cfg(user, ssh.Password(pwd))
 }
 
 func PkCfg(user string, pemBytes []byte) (*ssh.ClientConfig, error) {
@@ -99,12 +71,38 @@ func PkCfg(user string, pemBytes []byte) (*ssh.ClientConfig, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Parsing plain private key failed %v", err)
 	}
-	return &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
-			return nil
-		},
-		Timeout: 10 * time.Second,
-	}, nil
+	return cfg(user, ssh.PublicKeys(signer)), nil
+}
+
+func cfg(user string, auth ...ssh.AuthMethod) *ssh.ClientConfig {
+	c := &ssh.ClientConfig{
+		User:            user,
+		Auth:            append(auth, ssh.KeyboardInteractive(keyboardInteractiveChallenge)),
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         10 * time.Second,
+	}
+	return c
+}
+
+func keyboardInteractiveChallenge(name, instruction string, questions []string, echos []bool) (answers []string, err error) {
+
+	for _, v := range questions {
+		var res = ""
+		if len(v) > 0 {
+			prompt := promptui.Prompt{
+				Label: strings.Join(questions, ""),
+				Templates: &promptui.PromptTemplates{
+					Prompt:  "{{ . }} ",
+					Valid:   "{{ . | green }} ",
+					Success: "{{ . | green }} ",
+				},
+			}
+			res, err = prompt.Run()
+		}
+		if err != nil {
+			return nil, err
+		}
+		answers = append(answers, res)
+	}
+	return
 }

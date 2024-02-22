@@ -3,7 +3,6 @@ package store
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -42,9 +41,9 @@ func (s *SSHConfig) saveToPath(path string) error {
 	if e != nil {
 		return e
 	}
-	err := ioutil.WriteFile(path, b, os.ModePerm)
+	err := os.WriteFile(path, b, os.ModePerm)
 	if err == nil {
-		fmt.Println("save", s.Name, " success")
+		fmt.Println(fmt.Sprintf("save <%s> success", s.Name))
 	}
 	return err
 }
@@ -69,6 +68,9 @@ func (s *SSHConfig) Conn() (err error) {
 		cfg, err = ssh.PkCfg(s.User, s.SshKey)
 	} else {
 		cfg = ssh.PwdCfg(s.User, s.Pwd)
+	}
+	if err != nil {
+		return err
 	}
 	cli, err = ssh.Connect(s.Ip, s.Port, cfg)
 	if err != nil {

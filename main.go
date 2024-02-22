@@ -25,7 +25,7 @@ var version string
 func main() {
 
 	//flag.Parse()
-	cmd.Logo()
+	cmd.Logo(version)
 	if len(os.Args) < 2 {
 		cmd.Help()
 		return

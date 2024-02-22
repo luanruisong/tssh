@@ -3,8 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
+	"os"
 	"strings"
 
 	"github.com/manifoldco/promptui"
@@ -108,7 +108,7 @@ func addOrSave(body string, args []string, isAdd bool) {
 		privateKey []byte
 	)
 	if len(config.PrivateKeyPath) > 0 {
-		privateKey, err = ioutil.ReadFile(config.PrivateKeyPath)
+		privateKey, err = os.ReadFile(config.PrivateKeyPath)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
