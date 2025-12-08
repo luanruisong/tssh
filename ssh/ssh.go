@@ -2,12 +2,12 @@ package ssh
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
 	"io"
 	"strings"
 	"time"
 
 	"github.com/containerd/console"
+	"github.com/manifoldco/promptui"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -26,7 +26,6 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 		return err
 	}
 	defer session.Close()
-	session.Signal(ssh.SIGINT)
 	session.Stdout = stdOut
 	session.Stderr = stdErr
 	session.Stdin = in
@@ -38,6 +37,8 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 	if err = current.SetRaw(); err != nil {
 		return err
 	}
+	// 确保在函数返回时恢复终端状态
+	defer current.Reset()
 
 	if ws, err = current.Size(); err != nil {
 		return err
@@ -56,6 +57,10 @@ func RunTerminal(c *ssh.Client, in io.Reader, stdOut, stdErr io.Writer) error {
 		return err
 	}
 
+	// 监听窗口大小变化
+	stopResize := listenWindowResize(session, current)
+	defer stopResize()
+
 	if err = session.Shell(); err != nil {
 		return err
 	}
@@ -69,15 +74,19 @@ func PwdCfg(user, pwd string) *ssh.ClientConfig {
 func PkCfg(user string, pemBytes []byte) (*ssh.ClientConfig, error) {
 	signer, err := ssh.ParsePrivateKey(pemBytes)
 	if err != nil {
-		return nil, fmt.Errorf("Parsing plain private key failed %v", err)
+		return nil, fmt.Errorf("parsing plain private key failed: %v", err)
 	}
-	return cfg(user, ssh.PublicKeys(signer)), nil
+	// 使用 RetryableAuthMethod 包装 publickey，支持 partial success 后继续认证
+	pkAuth := ssh.RetryableAuthMethod(ssh.PublicKeys(signer), 3)
+	return cfg(user, pkAuth), nil
 }
 
 func cfg(user string, auth ...ssh.AuthMethod) *ssh.ClientConfig {
+	// keyboard-interactive 认证，用于 2FA/OTP 等场景
+	kbAuth := ssh.RetryableAuthMethod(ssh.KeyboardInteractive(keyboardInteractiveChallenge), 3)
 	c := &ssh.ClientConfig{
 		User:            user,
-		Auth:            append(auth, ssh.KeyboardInteractive(keyboardInteractiveChallenge)),
+		Auth:            append(auth, kbAuth),
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Timeout:         10 * time.Second,
 	}
@@ -85,24 +94,37 @@ func cfg(user string, auth ...ssh.AuthMethod) *ssh.ClientConfig {
 }
 
 func keyboardInteractiveChallenge(name, instruction string, questions []string, echos []bool) (answers []string, err error) {
+	// 显示服务器发送的指令信息
+	if len(instruction) > 0 {
+		fmt.Println(instruction)
+	}
 
-	for _, v := range questions {
-		var res = ""
-		if len(v) > 0 {
-			prompt := promptui.Prompt{
-				Label: strings.Join(questions, ""),
-				Templates: &promptui.PromptTemplates{
-					Prompt:  "{{ . }} ",
-					Valid:   "{{ . | green }} ",
-					Success: "{{ . | green }} ",
-				},
-			}
-			res, err = prompt.Run()
+	answers = make([]string, len(questions))
+	for i, question := range questions {
+		if len(question) == 0 {
+			answers[i] = ""
+			continue
 		}
+
+		prompt := promptui.Prompt{
+			Label: strings.TrimSpace(question),
+			Templates: &promptui.PromptTemplates{
+				Prompt:  "{{ . }} ",
+				Valid:   "{{ . | green }} ",
+				Success: "{{ . | green }} ",
+			},
+			// 如果 echos[i] 为 false，则隐藏输入（如密码/OTP）
+			Mask: func() rune {
+				if i < len(echos) && !echos[i] {
+					return '*'
+				}
+				return 0
+			}(),
+		}
+		answers[i], err = prompt.Run()
 		if err != nil {
 			return nil, err
 		}
-		answers = append(answers, res)
 	}
-	return
+	return answers, nil
 }

@@ -43,7 +43,7 @@ func (s *SSHConfig) saveToPath(path string) error {
 	}
 	err := os.WriteFile(path, b, os.ModePerm)
 	if err == nil {
-		fmt.Println(fmt.Sprintf("save <%s> success", s.Name))
+		fmt.Println("save", s.Name, "success")
 	}
 	return err
 }
