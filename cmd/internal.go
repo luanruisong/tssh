@@ -16,7 +16,7 @@ var (
 	validateFunc = func(input string) error {
 		g := store.GetBatchConfig()
 		if g.Get(input) == nil {
-			return errors.New("can not get config")
+			return errors.New("cannot get config")
 		}
 		return nil
 	}
@@ -37,17 +37,19 @@ func addOrSave(body string, args []string, isAdd bool) {
 			Templates: validateTpl,
 			Validate: func(input string) error {
 				if strings.Index(input, "@") < 0 {
-					return fmt.Errorf("con not decode:%s", input)
+					return fmt.Errorf("cannot decode:%s", input)
 				}
 				x := strings.Split(input, "@")
 				if len(x) != 2 {
-					return fmt.Errorf("con not decode:%s", input)
+					return fmt.Errorf("cannot decode:%s", input)
 				}
 				if len(x[0]) == 0 || len(x[1]) == 0 {
 					return fmt.Errorf("user && ip required")
 				}
-				if address := net.ParseIP(x[1]); address == nil {
-					return fmt.Errorf("con not decode ip:%s", x[1])
+				if net.ParseIP(x[1]) == nil {
+					if _, err := net.LookupHost(x[1]); err != nil {
+						return fmt.Errorf("cannot decode host:%s", x[1])
+					}
 				}
 				return nil
 			},

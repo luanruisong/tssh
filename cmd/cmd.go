@@ -57,7 +57,7 @@ func Save(body string, args []string) {
 func List() {
 	list := store.ListConfig()
 	if len(list) == 0 {
-		fmt.Println("can not get config list")
+		fmt.Println("cannot get config list")
 		return
 	}
 	prompt := promptui.Select{
@@ -86,7 +86,7 @@ func Conn(name string) {
 	batch := store.GetBatchConfig()
 	info := batch.Get(name)
 	if info == nil {
-		fmt.Println("can not find config", name)
+		fmt.Println("cannot find config", name)
 		return
 	}
 	if err := info.Conn(); err != nil {
